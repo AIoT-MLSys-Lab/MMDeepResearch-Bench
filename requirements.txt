@@ -1,0 +1,22 @@
+# --- Core LLM & API ---
+openai>=2.15.0
+google-generativeai>=0.4.0
+python-dotenv>=1.2.0
+requests>=2.32.0
+
+# --- PDF & Office Processing ---
+# [关键修正] import fitz 对应的是 PyMuPDF，千万别用 fitz
+PyMuPDF>=1.23.0
+python-docx>=1.1.0
+beautifulsoup4>=4.12.0
+
+# --- ML & Vision (通用版) ---
+# [关键修正] 去掉了本地特定的 dev 版本号，改用通用版本
+torch>=2.0.0
+open_clip_torch>=2.23.0
+numpy>=1.26.0
+Pillow>=10.0.0
+
+# --- Utilities ---
+# Protobuf 经常有版本冲突，保留你环境里的版本比较安全
+protobuf==3.20.3
