@@ -127,7 +127,7 @@ reports_runs/experiment_v1/
 
 ## 🧾 Citation
 
-If you use this codebase or the MMDR-Bench dataset in your research, please cite:
+If you find this codebase or the MMDR-Bench dataset useful in your research, please cite:
 
 ```bibtex
 @article{mmdrbench2025,
