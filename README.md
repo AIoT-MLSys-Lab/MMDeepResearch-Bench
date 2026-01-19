@@ -1,6 +1,6 @@
 # 🚀 MMDeepResearch-Bench: A Benchmark for Multimodal Deep Research Agents
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![Benchmark: MMDR-Bench](https://img.shields.io/badge/Benchmark-MMDR--Bench-red.svg)](#citation)
 
@@ -28,13 +28,16 @@
 
 ### 1) Clone
 ```bash
-git clone https://github.com/YourUsername/MMDR.git
+git clone [https://github.com/YourUsername/MMDR.git](https://github.com/YourUsername/MMDR.git)
 cd MMDR
+
 ```
 
 ### 2) Install dependencies
+
 ```bash
 pip install -r requirements.txt
+
 ```
 
 ---
@@ -42,11 +45,14 @@ pip install -r requirements.txt
 ## ⚙️ Configuration
 
 ### 1) Create `.env`
+
 ```bash
 cp env.txt
+
 ```
 
 ### 2) Edit `.env`
+
 Example (adjust to your providers/models):
 
 ```ini
@@ -63,6 +69,7 @@ GEMINI_API_KEY=AIza...
 AZURE_OPENAI_API_KEY=...
 AZURE_OPENAI_ENDPOINT=https://...
 OPENROUTER_API_KEY=...
+
 ```
 
 ---
@@ -70,29 +77,37 @@ OPENROUTER_API_KEY=...
 ## 🚀 Usage
 
 ### 1) Quick verification (recommended first run)
+
 Run the **first question only** to confirm API + paths:
 
 ```bash
 python run_pipeline.py --quiz_first
+
 ```
 
 ### 2) Full batch run
+
 Process all tasks in `quiz.jsonl`:
 
 ```bash
 python run_pipeline.py --run_id experiment_v1
+
 ```
 
 ### 3) Targeted debugging
+
 Re-run a single item by 1-based index:
 
 ```bash
 python run_pipeline.py --quiz_index 5 --run_id debug_q5
+
 ```
 
 ### 4) Parallel mode
+
 ```bash
 python run_pipeline.py --max_workers 4
+
 ```
 
 ---
@@ -120,6 +135,7 @@ reports_runs/experiment_v1/
 ├── summary/
 │   └── experiment_v1.txt     # aggregated stats (pass rate/avg scores)
 └── mm/                       # multimodal intermediate artifacts
+
 ```
 
 ---
@@ -135,10 +151,11 @@ If you find this codebase or the MMDR-Bench dataset useful in your research, ple
   journal={arXiv preprint},
   year={2025}
 }
+
 ```
 
 ---
 
 ## 📜 License
 
-This project is released under the **MIT License**. See [LICENSE](LICENSE).
+This project is released under the **Apache-2.0 License**. See [LICENSE](https://www.google.com/search?q=LICENSE).
