@@ -4,13 +4,13 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![Benchmark: MMDR-Bench](https://img.shields.io/badge/Benchmark-MMDR--Bench-red.svg)](#citation)
 
-This repository maintains the codebase of the end-to-end evaluation framework of the MMDeepResearch-Bench (MMDR benchmark).
+This repository maintains the codebase of the end-to-end evaluation framework of MMDeepResearch-Bench (MMDR benchmark).
 
 ---
 
 ## ✨ Key Features
 
-### 🔬 Evaluation Framework
+### 🔬 Innovative Metrics for Grounded Research Quality
 - **FLAE (Formula-LLM Adaptive Evaluation):** Measures report quality (readability, insightfulness, structure).
 - **TRACE (Trustworthy Retrieval-Aligned Citation Evaluation):** Verifies citation support and claim–URL alignment.
   - **VEF (Visual Evidence Fidelity):** A strict gatekeeper enforcing alignment between textual claims and visual evidence (PASS/FAIL).
