@@ -4,7 +4,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![Benchmark: MMDR-Bench](https://img.shields.io/badge/Benchmark-MMDR--Bench-red.svg)](#citation)
 
-**MMDR (Multi-Modal Deep Research)** is an automated pipeline for end-to-end multimodal deep research, fact verification, and citation-grounded synthesis. It follows a dual-role architecture (**Writer** & **Judge**) to generate research reports and evaluate them with strict, grounded criteria.
+This repository maintains the codebase of the end-to-end evaluation framework of the MMDeepResearch-Bench (MMDR benchmark).
 
 ---
 
