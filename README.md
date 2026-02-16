@@ -1,4 +1,4 @@
-# 🚀 MMDeepResearch-Bench: A Benchmark for Multimodal Deep Research Agents
+# MMDeepResearch-Bench: A Benchmark for Multimodal Deep Research Agents
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
