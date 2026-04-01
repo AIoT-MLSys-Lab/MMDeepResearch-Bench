@@ -12,7 +12,7 @@ This repository maintains the codebase of the end-to-end evaluation framework of
 
 ### 🔬 Innovative Metrics for Grounded Research Quality
 - **FLAE (Formula-LLM Adaptive Evaluation):** Measures report quality (readability, insightfulness, structure).
-- **TRACE (Trustworthy Retrieval-Aligned Citation Evaluation):** Verifies citation support and claim–URL alignment.
+- **TRACE (Trustworthy Retrieval-Aligned Citation Evaluation):** Verifies citation support and claim-URL alignment.
   - **VEF (Visual Evidence Fidelity):** A strict gatekeeper enforcing alignment between textual claims and visual evidence (PASS/FAIL).
 - **MOSAIC (Multimodal Support-Aligned Integrity Check):** Validates consistency between generated text and visual artifacts (Charts, Diagrams, Photos).
 
@@ -28,16 +28,14 @@ This repository maintains the codebase of the end-to-end evaluation framework of
 
 ### 1) Clone
 ```bash
-git clone [https://github.com/YourUsername/MMDR.git](https://github.com/YourUsername/MMDR.git)
+git clone https://github.com/YourUsername/MMDR.git
 cd MMDR
-
 ```
 
 ### 2) Install dependencies
 
 ```bash
 pip install -r requirements.txt
-
 ```
 
 ---
@@ -47,8 +45,7 @@ pip install -r requirements.txt
 ### 1) Create `.env`
 
 ```bash
-cp env.txt
-
+cp env.txt .env
 ```
 
 ### 2) Edit `.env`
@@ -69,7 +66,6 @@ GEMINI_API_KEY=AIza...
 AZURE_OPENAI_API_KEY=...
 AZURE_OPENAI_ENDPOINT=https://...
 OPENROUTER_API_KEY=...
-
 ```
 
 ---
@@ -82,7 +78,6 @@ Run the **first question only** to confirm API + paths:
 
 ```bash
 python run_pipeline.py --quiz_first
-
 ```
 
 ### 2) Full batch run
@@ -91,7 +86,6 @@ Process all tasks in `quiz.jsonl`:
 
 ```bash
 python run_pipeline.py --run_id experiment_v1
-
 ```
 
 ### 3) Targeted debugging
@@ -100,14 +94,12 @@ Re-run a single item by 1-based index:
 
 ```bash
 python run_pipeline.py --quiz_index 5 --run_id debug_q5
-
 ```
 
 ### 4) Parallel mode
 
 ```bash
 python run_pipeline.py --max_workers 4
-
 ```
 
 ---
@@ -115,7 +107,7 @@ python run_pipeline.py --max_workers 4
 ## 🎮 Runtime Controls
 
 | Command | Action |
-| --- | --- |
+|---------|--------|
 | `stop` + Enter | Safely stop after current tasks finish; saves outputs |
 | `Ctrl+C` | Triggers the same graceful shutdown behavior |
 
@@ -133,35 +125,38 @@ reports_runs/experiment_v1/
 ├── results/
 │   └── experiment_v1.jsonl   # detailed logs (scores/errors/timings)
 ├── summary/
-│   └── experiment_v1.txt     # aggregated stats (pass rate/avg scores)
+│   ├── experiment_v1.json    # machine-readable aggregated metrics
+│   └── experiment_v1.txt     # human-readable summary
 └── mm/                       # multimodal intermediate artifacts
-
 ```
- ## 📊 Metrics Explanation
 
-  The pipeline outputs three aggregate scores and one final combined score:
+---
 
-  | Aggregate | Full Name | Sub-metrics (Leaderboard) |
-  |-----------|-----------|--------------------------|
-  | **GEN** | General Quality (FLAE) | **Read.** (Readability), **Insh.** (Insightfulness), **Stru.** (Structure),
-  Coherence |
-  | **EVI** | Evidence Quality (TRACE) | **Con.** (Concordance), **Cov.** (Coverage), **Fid.** (Fidelity), Diversity |
-  | **MM** | Multimodal Quality (MOSAIC) | **Sem.** (Semantic), **Vef.** (Faithfulness), **Acc.** (Data Accuracy),
-  **VQA** (VQA Score) |
-  | **FINAL_MMDR** | Weighted combination of above | — |
+## 📊 Metrics Explanation
 
-  All sub-metrics are available in the output JSON file under `aggregates.{research|all}.submetrics`:
+The pipeline outputs three aggregate scores and one final combined score:
 
-  ```text
-  submetrics.general   →  general.R, general.I, general.S, general.C, ...
-  submetrics.evidence  →  evidence.E_con, evidence.E_cov, evidence.E_fid, evidence.E_div, ...
-  submetrics.mm        →  mm.avg_metric_by_dim.semantic, .faithful, .data_accuracy, .vqa_score, ...
+| Aggregate | Full Name | Sub-metrics (Leaderboard) |
+|-----------|-----------|--------------------------|
+| **GEN** | General Quality (FLAE) | **Read.** (Readability), **Insh.** (Insightfulness), **Stru.** (Structure), Coherence |
+| **EVI** | Evidence Quality (TRACE) | **Con.** (Concordance), **Cov.** (Coverage), **Fid.** (Fidelity), Diversity |
+| **MM** | Multimodal Quality (MOSAIC) | **Sem.** (Semantic), **Vef.** (Faithfulness), **Acc.** (Data Accuracy), **VQA** (VQA Score) |
+| **FINAL_MMDR** | Weighted combination of above | -- |
 
-  For detailed computation logic, see:
-  - scoring_general.py — GEN (FLAE)
-  - scoring_evidence.py — EVI (TRACE)
-  - mm_router5_aggregate.py — MM (MOSAIC)
-  - accuracy.py — VEF (verification gating)
+All sub-metrics are available in the output JSON file under `aggregates.{research|all}.submetrics`:
+
+```text
+submetrics.general   ->  general.R, general.I, general.S, general.C, ...
+submetrics.evidence  ->  evidence.E_con, evidence.E_cov, evidence.E_fid, evidence.E_div, ...
+submetrics.mm        ->  mm.avg_metric_by_dim.semantic, .faithful, .data_accuracy, .vqa_score, ...
+```
+
+For detailed computation logic, see:
+- `scoring_general.py` -- GEN (FLAE)
+- `scoring_evidence.py` -- EVI (TRACE)
+- `mm_router5_aggregate.py` -- MM (MOSAIC)
+- `accuracy.py` -- VEF (verification gating)
+
 ---
 
 ## 🧾 Citation
@@ -178,9 +173,11 @@ If you find this codebase or the MMDR-Bench dataset useful in your research, ple
       primaryClass={cs.CV},
       url={https://arxiv.org/abs/2601.12346}, 
 }
-
 ```
-## Contact and Community Results
+
+---
+
+## 📬 Contact and Community Results
 
 If you run MMDR-Bench and obtain interesting results, please submit them through our Google Form:
 
@@ -194,7 +191,6 @@ We welcome reports on:
 
 ---
 
-
 ## 📜 License
 
-This project is released under the **Apache-2.0 License**. See [LICENSE](https://www.google.com/search?q=LICENSE).
+This project is released under the **Apache-2.0 License**. See [LICENSE](LICENSE).
