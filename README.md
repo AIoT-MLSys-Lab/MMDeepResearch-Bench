@@ -145,16 +145,31 @@ reports_runs/experiment_v1/
 If you find this codebase or the MMDR-Bench dataset useful in your research, please cite:
 
 ```bibtex
-@article{mmdrbench2025,
-  title={MMDeepResearch-Bench: Grounded Evaluation and Alignment for Multimodal Deep Research Agents},
-  author={Anonymous},
-  journal={arXiv preprint},
-  year={2025}
+@misc{huang2026mmdeepresearchbenchbenchmarkmultimodaldeep,
+      title={MMDeepResearch-Bench: A Benchmark for Multimodal Deep Research Agents}, 
+      author={Peizhou Huang and Zixuan Zhong and Zhongwei Wan and Donghao Zhou and Samiul Alam and Xin Wang and Zexin Li and Zhihao Dou and Li Zhu and Jing Xiong and Chaofan Tao and Yan Xu and Dimitrios Dimitriadis and Tuo Zhang and Mi Zhang},
+      year={2026},
+      eprint={2601.12346},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2601.12346}, 
 }
 
 ```
+## Contact and Community Results
+
+If you run MMDR-Bench and obtain interesting results, please submit them through our Google Form:
+
+[Submit results and feedback via Google Form](https://docs.google.com/forms/d/e/1FAIpQLSfOUzuaLJorHAJ3P7g5-vM9mMYB-P3Fuep_6Ln1rhI8hocq-w/viewform?usp=header)
+
+We welcome reports on:
+- new model results
+- reproduction logs
+- implementation issues
+- suggestions for future benchmark extensions
 
 ---
+
 
 ## 📜 License
 
