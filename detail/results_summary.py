@@ -45,16 +45,44 @@ def _extract_general_metrics(raw: Dict[str, Any]) -> Dict[str, float]:
     g = raw.get("general")
     if not isinstance(g, dict): return {}
     out: Dict[str, float] = {}
-    keep = {"R": g.get("R"), "I": g.get("I"), "C": g.get("C"), "S": g.get("S"), "score": g.get("score")}
-    out.update(_flatten_numbers(keep, prefix="gen_rule"))
+    keep = {
+        "R": g.get("R"), "I": g.get("I"), "C": g.get("C"), "S": g.get("S"),
+        "score": g.get("score"),
+        "weights": g.get("weights"),
+        "features": g.get("features"),
+    }
+    out.update(_flatten_numbers(keep, prefix="general"))
+    judge = g.get("judge")
+    if isinstance(judge, dict):
+        judge_keep: Dict[str, Any] = {}
+        for k, v in judge.items():
+            if k in {"sections", "section_checks", "sentences"}:
+                continue
+            judge_keep[k] = v
+        out.update(_flatten_numbers(judge_keep, prefix="general.judge"))
+    ctrl = g.get("ctrl")
+    if isinstance(ctrl, dict):
+        out.update(_flatten_numbers(ctrl, prefix="general.ctrl"))
     return out
 
 def _extract_evidence_metrics(raw: Dict[str, Any]) -> Dict[str, float]:
     e = raw.get("evidence")
     if not isinstance(e, dict): return {}
+    stats = e.get("stats") if isinstance(e.get("stats"), dict) else {}
+    if isinstance(stats, dict) and "domain_counts" in stats:
+        stats = dict(stats)
+        stats.pop("domain_counts", None)
     out: Dict[str, float] = {}
-    keep = {"E_con": e.get("E_con"), "E_cov": e.get("E_cov"), "E_fid": e.get("E_fid"), "score": e.get("score")}
-    out.update(_flatten_numbers(keep, prefix="evi_rule"))
+    out.update(_flatten_numbers({
+        "E_con": e.get("E_con"), "E_cov": e.get("E_cov"),
+        "E_fid": e.get("E_fid"), "E_div": e.get("E_div"),
+        "score": e.get("score"),
+        "weights": e.get("weights"),
+        "stats": stats,
+    }, prefix="evidence"))
+    ctrl = e.get("ctrl")
+    if isinstance(ctrl, dict):
+        out.update(_flatten_numbers(ctrl, prefix="evidence.ctrl"))
     return out
 
 def _extract_mm_metrics_from_final_summary(path: str) -> Dict[str, float]:

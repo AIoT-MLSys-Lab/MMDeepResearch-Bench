@@ -82,6 +82,9 @@ def process_single_task(
 
     md_path = reports_dir / f"{safe_qid}.md"
     report_text = ""
+    t0 = time.time()
+    gen_err = None
+    skip_generation = False
 
     # ==========================================================================
     # 1. 检查断点续传 (Resume)
@@ -92,9 +95,10 @@ def process_single_task(
             if len(content) >= runtime.min_report_chars:
                 print(f"[{idx+1}/{total_tasks}] {safe_qid}: [Resume] Found existing report.")
                 report_text = content
+                skip_generation = True
         except Exception:
             pass
-    
+
     # ==========================================================================
     # 2. 生成报告 (Generation)
     # ==========================================================================
@@ -112,9 +116,10 @@ def process_single_task(
             if report_text:
                 md_path.write_text(report_text, encoding="utf-8")
         except Exception as e:
+            gen_err = str(e)
             print(f"[{idx+1}/{total_tasks}] {safe_qid}: ❌ Gen Error: {e}")
             # 如果生成挂了，直接跳过后续，不写入结果或者写入 0 分
-            return 
+            return
 
     # 再次检查长度，如果太短，不进评测
     if len(report_text) < runtime.min_report_chars:
@@ -133,6 +138,7 @@ def process_single_task(
     # 3. 规则评分 (Rule Scoring: GEN & EVI)
     # ==========================================================================
     scores_raw = {}
+    score_err = None
     try:
         scores_raw = score_report(
             report_text=report_text,
@@ -143,6 +149,7 @@ def process_single_task(
             question_id=safe_qid
         )
     except Exception as e:
+        score_err = f"Judge Crashed: {e}"
         print(f"[{idx+1}/{total_tasks}] {safe_qid}: Rule Score Error: {e}")
 
     GEN = float(scores_raw.get("general_score", 0.0) or 0.0)
@@ -152,6 +159,7 @@ def process_single_task(
     # 4. 多模态评分 (MM Scoring)
     # ==========================================================================
     MM = 0.0
+    mm_payload: Dict[str, Any] = {"activated": False}
     # 只有当分数正常才跑 MM
     if GEN > 0 and EVI > 0:
         mm_res = maybe_run_mm_stage(
@@ -160,6 +168,7 @@ def process_single_task(
             max_items=runtime.mm_max_items,
             dump_items_json=mm_dir / f"{safe_qid}.mm_items.json"
         )
+        mm_payload = mm_res
         val = mm_res.get("mm_score")
         if val is not None:
             MM = float(val)
@@ -219,16 +228,41 @@ def process_single_task(
     # [KEYS UPDATED TO VEF]
     record = {
         "qid": safe_qid,
+        "question_title": t.title,
         "run_id": run_context["run_id"],
+        "report_type": report_type,
+        "report_provider": run_context.get("report_provider", ""),
+        "report_model": run_context.get("report_model", ""),
+        "judge_provider": run_context.get("judge_provider", ""),
+        "judge_model": run_context.get("judge_model", ""),
+        "generation": {
+            "time_s": round(time.time() - t0, 3),
+            "error": gen_err,
+            "report_path": str(md_path),
+            "skipped_existing": skip_generation,
+        },
+        "scoring": {
+            "error": score_err,
+            "scores": {
+                "GEN": GEN,
+                "EVI": EVI,
+                "MM": MM,
+                "VEF": VEF_Score,    # Was ACC
+                "VEF_Raw": VEF_Raw,  # Was ACC_Raw
+                "FINAL_MMDR": final_score
+            },
+            "raw": scores_raw,
+        },
         "scores": {
             "GEN": GEN,
             "EVI": EVI,
             "MM": MM,
-            "VEF": VEF_Score,    # Was ACC
-            "VEF_Raw": VEF_Raw,  # Was ACC_Raw
+            "VEF": VEF_Score,
+            "VEF_Raw": VEF_Raw,
             "FINAL_MMDR": final_score
         },
-        "accuracy_detail": { 
+        "mm": mm_payload,
+        "accuracy_detail": {
             "verdict": VEF_Verdict,
             "reason": VEF_Reason,
             "has_gt": bool(t.ground_truth)
