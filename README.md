@@ -137,7 +137,31 @@ reports_runs/experiment_v1/
 └── mm/                       # multimodal intermediate artifacts
 
 ```
+ ## 📊 Metrics Explanation
 
+  The pipeline outputs three aggregate scores and one final combined score:
+
+  | Aggregate | Full Name | Sub-metrics (Leaderboard) |
+  |-----------|-----------|--------------------------|
+  | **GEN** | General Quality (FLAE) | **Read.** (Readability), **Insh.** (Insightfulness), **Stru.** (Structure),
+  Coherence |
+  | **EVI** | Evidence Quality (TRACE) | **Con.** (Concordance), **Cov.** (Coverage), **Fid.** (Fidelity), Diversity |
+  | **MM** | Multimodal Quality (MOSAIC) | **Sem.** (Semantic), **Vef.** (Faithfulness), **Acc.** (Data Accuracy),
+  **VQA** (VQA Score) |
+  | **FINAL_MMDR** | Weighted combination of above | — |
+
+  All sub-metrics are available in the output JSON file under `aggregates.{research|all}.submetrics`:
+
+  ```text
+  submetrics.general   →  general.R, general.I, general.S, general.C, ...
+  submetrics.evidence  →  evidence.E_con, evidence.E_cov, evidence.E_fid, evidence.E_div, ...
+  submetrics.mm        →  mm.avg_metric_by_dim.semantic, .faithful, .data_accuracy, .vqa_score, ...
+
+  For detailed computation logic, see:
+  - scoring_general.py — GEN (FLAE)
+  - scoring_evidence.py — EVI (TRACE)
+  - mm_router5_aggregate.py — MM (MOSAIC)
+  - accuracy.py — VEF (verification gating)
 ---
 
 ## 🧾 Citation
