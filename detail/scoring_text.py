@@ -71,14 +71,14 @@ def looks_like_image_url(url: str) -> bool:
 
 def normalize_report_type(report_type: str) -> str:
     rt = (report_type or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if rt.startswith("research_") or rt in {"research", "academic", "publishable", "top_conference", "deep"}:
+        return "research"
     if "daily_easy" in rt or rt in {"easy"}:
         return "daily_easy"
     if "daily_hard" in rt or rt in {"hard"}:
         return "daily_hard"
     if "daily" in rt:
         return "daily_medium"
-    if rt in {"research", "publishable", "top_conference", "deep"}:
-        return "research"
     return "daily_medium"
 
 

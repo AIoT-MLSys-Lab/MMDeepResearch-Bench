@@ -6,13 +6,23 @@ from typing import List, Dict, Optional
 from .models import Task
 
 def determine_report_type(t: Task) -> str:
-    # (保持原有逻辑不变)
+    """Map canonical task metadata to the corrected scoring profile."""
     meta = t.meta or {}
-    if (meta.get("set") or "").lower() == "research":
-        diff = (meta.get("difficulty") or "").strip().lower()
-        if diff in {"easy", "hard", "complex"}:
-            return f"research_{diff}"
+    task_set = str(meta.get("set") or "").strip().lower()
+    difficulty = str(meta.get("difficulty") or "").strip().lower()
+
+    if task_set in {"research", "academic"}:
         return "research"
+
+    if task_set == "daily":
+        if difficulty in {"easy", "hard"}:
+            return f"daily_{difficulty}"
+        return "daily_medium"
+
+    match = re.fullmatch(r"Q(\d+)", str(t.qid or "").strip(), flags=re.IGNORECASE)
+    if match:
+        return "research" if int(match.group(1)) < 100 else "daily_medium"
+
     return "daily_medium"
 
 def format_task_for_llm(t: Task) -> str:
@@ -126,9 +136,18 @@ def load_research_tasks(json_path: str, image_root: str, gt_path: Optional[str] 
         ground_truth = gt_map.get(str(i)) or gt_map.get(raw_id) or ""
         # ----------------
         
+        # Canonical release split: Q0-Q99 Research, Q100-Q139 Daily.
+        match = re.fullmatch(r"Q(\d+)", raw_id, flags=re.IGNORECASE)
+        canonical_index = int(match.group(1)) if match else i
+        explicit_set = str(obj.get("set") or obj.get("split") or obj.get("regime") or "").strip().lower()
+        task_set = explicit_set if explicit_set in {"research", "daily"} else (
+            "research" if canonical_index < 100 else "daily"
+        )
         meta = {
-            "set": "research",
+            "set": task_set,
             "difficulty": (obj.get("difficulty") or "").strip().lower() or None,
+            "language": (obj.get("language") or "").strip().lower() or None,
+            "tags": obj.get("tags") or [],
             "source": "jsonl"
         }
 

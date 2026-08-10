@@ -10,6 +10,8 @@ from .generation import generate_report_with_auto_clarification
 from .scoring import score_report
 # [核心] 引入判卷模块
 from .accuracy import run_accuracy_check
+from .utils import resolve_vertexai_urls
+from .config import LLM
 
 WRITE_LOCK = threading.Lock()
 
@@ -121,6 +123,14 @@ def process_single_task(
             # 如果生成挂了，直接跳过后续，不写入结果或者写入 0 分
             return
 
+    # ==========================================================================
+    # 2.5 解析 Vertex AI Search 重定向 URL (适配 Gemini Deep Research)
+    # ==========================================================================
+    if "vertexaisearch.cloud.google.com" in report_text:
+        print(f"[{idx+1}/{total_tasks}] {safe_qid}: Resolving vertexaisearch URLs...")
+        report_text = resolve_vertexai_urls(report_text)
+        md_path.write_text(report_text, encoding="utf-8")
+
     # 再次检查长度，如果太短，不进评测
     if len(report_text) < runtime.min_report_chars:
         print(f"[{idx+1}/{total_tasks}] {safe_qid}: ⚠️ Report too short ({len(report_text)} chars). Skipping Judge.")
@@ -186,7 +196,7 @@ def process_single_task(
         
         # [Strict Logic 1] Segment Calculation
         # idx < 100 为 ACADEMIC, 否则 DAILY
-        segment = "ACADEMIC" if idx < 100 else "DAILY"
+        segment = "DAILY" if report_type.lower().startswith("daily") else "ACADEMIC"
         
         # Call judge (renamed logic variable, implies VEF check)
         acc_res = run_accuracy_check(
@@ -197,7 +207,7 @@ def process_single_task(
             gt=t.ground_truth,
             report=report_text,
             images=t.images,
-            temperature=0.1
+            temperature=LLM.judge_temperature
         )
         
         VEF_Raw = int(acc_res.get("score", 0) or 0)
@@ -231,6 +241,9 @@ def process_single_task(
         "question_title": t.title,
         "run_id": run_context["run_id"],
         "report_type": report_type,
+        "task_split": str((t.meta or {}).get("set") or ""),
+        "task_difficulty": str((t.meta or {}).get("difficulty") or ""),
+        "evaluator_semantics": "canonical-v2",
         "report_provider": run_context.get("report_provider", ""),
         "report_model": run_context.get("report_model", ""),
         "judge_provider": run_context.get("judge_provider", ""),
