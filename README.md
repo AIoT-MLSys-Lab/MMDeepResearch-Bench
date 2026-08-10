@@ -35,15 +35,15 @@ evaluator to make future runs and leaderboard exports unambiguous:
 
 ---
 
-## ? Key Features
+## ✨ Key Features
 
-### ?? Innovative Metrics for Grounded Research Quality
+### 🔬 Innovative Metrics for Grounded Research Quality
 - **FLAE (Formula-LLM Adaptive Evaluation):** Measures report quality (readability, insightfulness, structure).
 - **TRACE (Trustworthy Retrieval-Aligned Citation Evaluation):** Verifies citation support and claim-URL alignment.
   - **VEF (Visual Evidence Fidelity):** A strict gatekeeper enforcing alignment between textual claims and visual evidence (PASS/FAIL).
 - **MOSAIC (Multimodal Support-Aligned Integrity Check):** Validates consistency between generated text and visual artifacts (Charts, Diagrams, Photos).
 
-### ??? Engineering & Usability
+### 🛠️ Engineering & Usability
 - **Smart Resume:** Skips already-completed tasks to reduce time and API cost.
 - **Graceful Stop:** Safe shutdown via CLI (`stop`, `exit`) or `Ctrl+C`, ensuring partial results are flushed.
 - **Precision Debugging:** Run a single case with `--quiz_first` or `--quiz_index`.
@@ -51,7 +51,7 @@ evaluator to make future runs and leaderboard exports unambiguous:
 
 ---
 
-## ?? Installation
+## 📦 Installation
 
 ### 1) Clone
 ```bash
@@ -67,7 +67,7 @@ pip install -r requirements.txt
 
 ---
 
-## ?? Configuration
+## ⚙️ Configuration
 
 ### 1) Create `.env`
 
@@ -99,7 +99,7 @@ OPENROUTER_API_KEY=...
 
 ---
 
-## ?? Usage
+## 🚀 Usage
 
 ### 1) Quick verification (recommended first run)
 
@@ -133,7 +133,7 @@ python run_pipeline.py --max_workers 4
 
 ---
 
-## ?? Runtime Controls
+## 🎮 Runtime Controls
 
 | Command | Action |
 |---------|--------|
@@ -142,24 +142,24 @@ python run_pipeline.py --max_workers 4
 
 ---
 
-## ?? Output Structure
+## 📂 Output Structure
 
 Outputs are written to `reports_runs/<RUN_ID>/`:
 
 ```text
 reports_runs/experiment_v1/
-??? reports/                  # Markdown research reports
-?   ??? Q1.md
-?   ??? ...
-??? results/
-?   ??? experiment_v1.jsonl   # detailed logs (scores/errors/timings)
-??? summary/
-?   ??? experiment_v1.json    # machine-readable aggregated metrics
-?   ??? experiment_v1.txt     # human-readable summary
-?   ??? experiment_v1.leaderboard.csv
-?   ??? experiment_v1.task_scores.csv
-?   ??? experiment_v1.leaderboard_manifest.json
-??? mm/                       # multimodal intermediate artifacts
+├── reports/                  # Markdown research reports
+│   ├── Q1.md
+│   └── ...
+├── results/
+│   └── experiment_v1.jsonl   # detailed logs (scores/errors/timings)
+├── summary/
+│   ├── experiment_v1.json    # machine-readable aggregated metrics
+│   ├── experiment_v1.txt     # human-readable summary
+│   ├── experiment_v1.leaderboard.csv
+│   ├── experiment_v1.task_scores.csv
+│   └── experiment_v1.leaderboard_manifest.json
+└── mm/                       # multimodal intermediate artifacts
 ```
 
 The pipeline writes the leaderboard and task-level CSV files automatically. To
@@ -179,7 +179,7 @@ the row is submission-ready.
 
 ---
 
-## ?? Metrics Explanation
+## 📊 Metrics Explanation
 
 The pipeline outputs three aggregate scores and one final combined score:
 
@@ -228,7 +228,7 @@ For detailed computation logic, see:
 
 ---
 
-## ?? Citation
+## 🧾 Citation
 
 If you find this codebase or the MMDR-Bench dataset useful in your research, please cite:
 
@@ -246,7 +246,7 @@ If you find this codebase or the MMDR-Bench dataset useful in your research, ple
 
 ---
 
-## ?? Contact and Community Results
+## 📬 Contact and Community Results
 
 If you run MMDR-Bench and obtain interesting results, please submit them through our Google Form:
 
@@ -260,6 +260,6 @@ We welcome reports on:
 
 ---
 
-## ?? License
+## 📜 License
 
 This project is released under the **Apache-2.0 License**. See [LICENSE](LICENSE).
