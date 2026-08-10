@@ -1,0 +1,96 @@
+# =========================================================
+# RULES FOR MULTIMODAL DEEP RESEARCH BENCHMARK
+# =========================================================
+
+## 0. Core Goal
+Generate a high-quality report that matches the user's intent and is supported by verifiable evidence.
+Daily tasks may be casual, mixed-language (CN/EN), and images may be noisy or only partially relevant.
+
+## 1) Evidence & Citations (CRITICAL)
+### 1.1 In-text citations
+- Put citation markers immediately after factual statements: e.g. "... was founded in 2015 [1]."
+- If one sentence uses multiple sources: "... [1][2]".
+- Prefer placing citations in the SAME sentence as the claim (avoid citations only at paragraph end).
+
+### 1.2 References section
+At the end of the report include:
+
+References:
+[1] https://...
+[2] https://...
+
+- Each [n] must map to exactly one URL.
+- URLs must be reachable web pages or direct files (including images).
+
+### 1.3 Claim-Evidence pairing
+- Each cited claim should be verifiable by its cited URL(s).
+- Paraphrase is allowed: evidence can support a claim even if wording differs.
+- If a detail is uncertain, state uncertainty explicitly instead of inventing.
+
+### 1.4 Source quantity (helps evidence evaluation)
+- Daily: use ~6+ unique sources when possible.
+- Research: use ~10+ unique sources when possible.
+- Avoid repeating the same domain for all citations unless unavoidable.
+
+### 1.5 Inline visual evidence (CRITICAL for multimodal eval)
+If you rely on an image (photo / screenshot / chart / diagram) for a claim or explanation, you MUST include it inline in the report body near the relevant paragraph(s).
+
+Required format (put the image on its own line):
+
+Figure X: <short caption / what it shows> [n]
+![Figure X](https://direct.image.url/xxx.png)
+
+Rules:
+- The image URL SHOULD be a direct image file when possible (e.g., .png/.jpg). If you only have a webpage that contains the image, you may still embed the page URL, but direct image URLs are preferred.
+- The same evidence must still appear in the final References section: [n] must map to exactly one URL.
+- The caption line MUST include the citation marker [n] for the image.
+- In the nearby paragraph(s), explain how the visual evidence supports the claim, and keep citations inside the same sentence when feasible.
+- Do NOT dump a gallery without explanations. Each embedded image must have at least 1–2 sentences of explanation.
+
+If the task provides input images (e.g., question JSON contains image_url), you MUST embed those input images inline and refer to them as Figure 1/2/3... before drawing conclusions.
+
+## 2) Source Policy (Three-Level)
+We categorize sources as:
+
+A) Authoritative (bonus): government, international organizations, academic institutions, official statistics.
+B) Acceptable (allowed): mainstream media, company official websites/press releases, industry associations, encyclopedias.
+C) Prohibited (penalty): social media, personal blogs, Q&A forums (e.g., Reddit/Quora/Zhihu/Weibo), unmoderated posts.
+
+- Using "Acceptable" sources is NOT a violation.
+- Only "Prohibited" sources count as violations.
+
+## 3) Multimodal & Daily Realism
+### 3.1 Daily realism
+- Images may be screenshots/camera captures/mixed-language UI and may only convey partial or surface information.
+- Do not overfit the report to image surface details. Infer the real user intent.
+
+### 3.2 Webpage image depth (Patience)
+If the report relies on an image inside a cited webpage:
+- We simulate limited human patience (limited scroll depth / token budget).
+- If the relevant image appears deeper, evidence strength decays gradually.
+- If the relevant image is not found within the patience budget, evidence contribution may be near 0 for that image-dependent claim.
+- Best practice: if feasible, cite the direct image URL or provide a second reference pointing closer to the image.
+
+## 4) Report Structure
+Preferred sections (best-effort; Daily tasks can be looser):
+- Executive Summary / TL;DR
+- Background / Context
+- Methodology / How sources were used
+- Analysis & Evidence
+- Visual Integration (if applicable)
+- Conclusion / Takeaways
+
+## 5) Judge Output Requirement (for scoring)
+The judge must output structured JSON.
+
+General metrics:
+- E, p_analysis, rho_connective, rho_synthesis, U, O, T, kappa, theta, sections flags.
+- Optional holistic scores: llm_R, llm_I, llm_C, llm_S (0..1) for mixed scoring.
+
+Evidence pair audit:
+- support_strength, hallucination_prob, inversion_prob, chain_sound_prob, source_category.
+
+Dynamic weights:
+- v_general, v_evidence, lambda_final.
+
+All values must be in [0,1] where applicable.

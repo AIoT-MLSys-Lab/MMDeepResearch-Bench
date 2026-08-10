@@ -8,15 +8,42 @@ This repository maintains the codebase of the end-to-end evaluation framework of
 
 ---
 
-## ✨ Key Features
+## Update (10 August 2026)
 
-### 🔬 Innovative Metrics for Grounded Research Quality
+Following a reproducibility audit of commit `9f24d03`, we updated the released
+evaluator to make future runs and leaderboard exports unambiguous:
+
+- Task split and difficulty are now handled separately. Canonical task IDs
+  `Q0-Q99` are Research and `Q100-Q139` are Daily; difficulty remains an
+  independent easy, medium, hard, or complex label.
+- New records store `task_split`, `task_difficulty`, and
+  `evaluator_semantics="canonical-v2"`.
+- `detail/leaderboard_export.py` exports task-level and aggregate scores,
+  records source hashes and metric denominators, and can reject incomplete
+  140-task leaderboard rows.
+- The official aggregation is
+  `TRACE = 0.6*EVI + 0.4*VEF` and
+  `Overall = 0.2*GEN + 0.3*EVI + 0.2*VEF + 0.3*MM`.
+- Historical leaderboard evaluation was staged: GEN, EVI, and MM were scored
+  first, VEF was evaluated separately, and the retained components were fused
+  offline. This maintenance update does not silently rewrite frozen paper
+  scores.
+- Missing or unusable task-level MOSAIC output contributes `MM = 0` to the
+  all-task aggregate, while Sem., Acc., and VQA use conditional denominators
+  over applicable, successfully routed outputs. `mm_na_penalty.py` was not used
+  for the published leaderboard.
+
+---
+
+## ? Key Features
+
+### ?? Innovative Metrics for Grounded Research Quality
 - **FLAE (Formula-LLM Adaptive Evaluation):** Measures report quality (readability, insightfulness, structure).
 - **TRACE (Trustworthy Retrieval-Aligned Citation Evaluation):** Verifies citation support and claim-URL alignment.
   - **VEF (Visual Evidence Fidelity):** A strict gatekeeper enforcing alignment between textual claims and visual evidence (PASS/FAIL).
 - **MOSAIC (Multimodal Support-Aligned Integrity Check):** Validates consistency between generated text and visual artifacts (Charts, Diagrams, Photos).
 
-### 🛠️ Engineering & Usability
+### ??? Engineering & Usability
 - **Smart Resume:** Skips already-completed tasks to reduce time and API cost.
 - **Graceful Stop:** Safe shutdown via CLI (`stop`, `exit`) or `Ctrl+C`, ensuring partial results are flushed.
 - **Precision Debugging:** Run a single case with `--quiz_first` or `--quiz_index`.
@@ -24,12 +51,12 @@ This repository maintains the codebase of the end-to-end evaluation framework of
 
 ---
 
-## 📦 Installation
+## ?? Installation
 
 ### 1) Clone
 ```bash
-git clone https://github.com/YourUsername/MMDR.git
-cd MMDR
+git clone https://github.com/AIoT-MLSys-Lab/MMDeepResearch-Bench.git
+cd MMDeepResearch-Bench
 ```
 
 ### 2) Install dependencies
@@ -40,7 +67,7 @@ pip install -r requirements.txt
 
 ---
 
-## ⚙️ Configuration
+## ?? Configuration
 
 ### 1) Create `.env`
 
@@ -55,11 +82,13 @@ Example (adjust to your providers/models):
 ```ini
 # --- Roles ---
 MMDR_REPORT_PROVIDER=gemini       # gemini | azure | openrouter
-MMDR_JUDGE_PROVIDER=azure         # recommended: strong reasoning model
+MMDR_JUDGE_PROVIDER=gemini
 
 # --- Models ---
 MMDR_REPORT_MODEL=gemini-1.5-pro
-MMDR_JUDGE_MODEL=gpt-4o
+MMDR_JUDGE_MODEL=gemini-2.5-pro
+MMDR_JUDGE_TEMPERATURE=0.2
+MMDR_WEIGHTS=2,3,3,2
 
 # --- API Keys / Endpoints ---
 GEMINI_API_KEY=AIza...
@@ -70,7 +99,7 @@ OPENROUTER_API_KEY=...
 
 ---
 
-## 🚀 Usage
+## ?? Usage
 
 ### 1) Quick verification (recommended first run)
 
@@ -104,7 +133,7 @@ python run_pipeline.py --max_workers 4
 
 ---
 
-## 🎮 Runtime Controls
+## ?? Runtime Controls
 
 | Command | Action |
 |---------|--------|
@@ -113,35 +142,53 @@ python run_pipeline.py --max_workers 4
 
 ---
 
-## 📂 Output Structure
+## ?? Output Structure
 
 Outputs are written to `reports_runs/<RUN_ID>/`:
 
 ```text
 reports_runs/experiment_v1/
-├── reports/                  # Markdown research reports
-│   ├── Q1.md
-│   └── ...
-├── results/
-│   └── experiment_v1.jsonl   # detailed logs (scores/errors/timings)
-├── summary/
-│   ├── experiment_v1.json    # machine-readable aggregated metrics
-│   └── experiment_v1.txt     # human-readable summary
-└── mm/                       # multimodal intermediate artifacts
+??? reports/                  # Markdown research reports
+?   ??? Q1.md
+?   ??? ...
+??? results/
+?   ??? experiment_v1.jsonl   # detailed logs (scores/errors/timings)
+??? summary/
+?   ??? experiment_v1.json    # machine-readable aggregated metrics
+?   ??? experiment_v1.txt     # human-readable summary
+?   ??? experiment_v1.leaderboard.csv
+?   ??? experiment_v1.task_scores.csv
+?   ??? experiment_v1.leaderboard_manifest.json
+??? mm/                       # multimodal intermediate artifacts
 ```
+
+The pipeline writes the leaderboard and task-level CSV files automatically. To
+export an existing run, or to fail fast when any of the 140 task-level component
+scores is missing, run:
+
+```bash
+python export_leaderboard.py \
+  --results reports_runs/experiment_v1/results/experiment_v1.jsonl \
+  --model_name "Your model name" \
+  --require_complete
+```
+
+`--require_complete` is recommended for every leaderboard submission. The
+manifest records the source SHA256, task/component counts, formulas, and whether
+the row is submission-ready.
 
 ---
 
-## 📊 Metrics Explanation
+## ?? Metrics Explanation
 
 The pipeline outputs three aggregate scores and one final combined score:
 
 | Aggregate | Full Name | Sub-metrics (Leaderboard) |
 |-----------|-----------|--------------------------|
-| **GEN** | General Quality (FLAE) | **Read.** (Readability), **Insh.** (Insightfulness), **Stru.** (Structure), Coherence |
-| **EVI** | Evidence Quality (TRACE) | **Con.** (Concordance), **Cov.** (Coverage), **Fid.** (Fidelity), Diversity |
-| **MM** | Multimodal Quality (MOSAIC) | **Sem.** (Semantic), **Vef.** (Faithfulness), **Acc.** (Data Accuracy), **VQA** (VQA Score) |
-| **FINAL_MMDR** | Weighted combination of above | -- |
+| **FLAE / GEN** | General report quality | **Read.** = `general.R`, **Insh.** = `general.I`, **Stru.** = `general.S` |
+| **TRACE** | Citation and visual-evidence fidelity | **Vef.** = thresholded `scores.VEF`, **Con.** = `evidence.E_con`, **Cov.** = `evidence.E_cov`, **Fid.** = `evidence.E_fid` |
+| **MOSAIC / MM** | Multimodal evidence integrity | **Sem.** = `semantic`, **Acc.** = `data_accuracy`, **VQA** = `vqa_score` from the final routed MOSAIC summary |
+| **FINAL_MMDR** | Official aggregate | `0.2*FLAE + 0.5*TRACE + 0.3*MOSAIC` |
 
 All sub-metrics are available in the output JSON file under `aggregates.{research|all}.submetrics`:
 
@@ -151,6 +198,28 @@ submetrics.evidence  ->  evidence.E_con, evidence.E_cov, evidence.E_fid, evidenc
 submetrics.mm        ->  mm.avg_metric_by_dim.semantic, .faithful, .data_accuracy, .vqa_score, ...
 ```
 
+The fixed internal TRACE coefficient is `lambda_VEF=0.4`, so
+`TRACE = 0.6*EVI + 0.4*VEF`. Equivalently, the implementation-level formula is
+`FINAL_MMDR = 0.2*GEN + 0.3*EVI + 0.2*VEF + 0.3*MM`, which is why the CLI weight
+tuple is `2,3,3,2` in `(GEN,EVI,MM,VEF)` order.
+
+`VEF_Raw` is an audit field on the judge's pre-threshold scale and must not be
+used as the leaderboard `Vef.` column. The canonical task split is fixed by QID:
+`Q0-Q99` are Research and `Q100-Q139` are Daily. MOSAIC dimensions are routed by
+visual type, so their manifest counts can be below 140 even for a complete run;
+each displayed submetric is averaged over tasks where that dimension applies.
+
+**Compatibility note for commit `9f24d03`:** the earlier text summary exposed
+`VEF_Raw_Judge`, and the historical table assembly used that audit value for the
+displayed `Vef.` breakdown. Retained caches contain both 0-10 and 0-100 raw
+values, so that display is not a valid leaderboard component. This does not
+change the published `Overall`, which was computed from thresholded `scores.VEF`.
+The exporter above is the canonical submission path and will be used to correct
+the affected breakdown column.
+
+A complete example generated from a retained current-schema run is provided in
+`reference_outputs/gemini31flash/`.
+
 For detailed computation logic, see:
 - `scoring_general.py` -- GEN (FLAE)
 - `scoring_evidence.py` -- EVI (TRACE)
@@ -159,7 +228,7 @@ For detailed computation logic, see:
 
 ---
 
-## 🧾 Citation
+## ?? Citation
 
 If you find this codebase or the MMDR-Bench dataset useful in your research, please cite:
 
@@ -177,7 +246,7 @@ If you find this codebase or the MMDR-Bench dataset useful in your research, ple
 
 ---
 
-## 📬 Contact and Community Results
+## ?? Contact and Community Results
 
 If you run MMDR-Bench and obtain interesting results, please submit them through our Google Form:
 
@@ -191,6 +260,6 @@ We welcome reports on:
 
 ---
 
-## 📜 License
+## ?? License
 
 This project is released under the **Apache-2.0 License**. See [LICENSE](LICENSE).

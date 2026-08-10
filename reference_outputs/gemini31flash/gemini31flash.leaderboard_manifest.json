@@ -1,0 +1,46 @@
+{
+  "schema": "mmdr-leaderboard-v1",
+  "source_results": "results/gemini31flash.jsonl",
+  "source_sha256": "e068af5452118f3931825129ee209c75e59d507fe504e08e7fe48c16c1513029",
+  "model": "Gemini 3.1 Flash Lite",
+  "split": "all",
+  "records_selected": 140,
+  "records_complete": 140,
+  "expected_records": 140,
+  "submission_ready": true,
+  "duplicate_qids_last_record_retained": [],
+  "missing_component_tasks": [],
+  "metric_counts": {
+    "Overall": 140,
+    "Read.": 140,
+    "Insh.": 140,
+    "Stru.": 140,
+    "Vef.": 140,
+    "Con.": 140,
+    "Cov.": 140,
+    "Fid.": 140,
+    "Sem.": 120,
+    "Acc.": 71,
+    "VQA": 102
+  },
+  "formula_verification": {
+    "records_compared": 140,
+    "mean_absolute_delta": 0.0002450000000000634,
+    "max_absolute_delta": 0.0005000000000023874
+  },
+  "formulas": {
+    "TRACE": "0.6 * EVI + 0.4 * VEF",
+    "Overall": "0.2 * FLAE + 0.5 * TRACE + 0.3 * MOSAIC",
+    "VEF": "100 * mean(thresholded PASS indicator; threshold=6/10)"
+  },
+  "notes": [
+    "This is a separate current-schema Gemini 3.1 Flash Lite validation run; it was not part of the arXiv leaderboard snapshot and is not a proxy for Gemini 3 Flash or another historical system.",
+    "Canonical split is Q0-Q99 Research and Q100-Q139 Daily.",
+    "MOSAIC submetrics average only tasks on which that routed dimension is applicable and scored.",
+    "VEF_Raw is intentionally excluded because historical caches contain both 0-10 and 0-100 raw scales."
+  ],
+  "outputs": {
+    "leaderboard_csv": "gemini31flash.leaderboard.csv",
+    "task_scores_csv": "gemini31flash.task_scores.csv"
+  }
+}
